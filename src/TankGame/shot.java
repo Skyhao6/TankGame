@@ -40,7 +40,7 @@ public class shot implements Runnable {
                 case "LEFT" -> x -= speed;
                 case "RIGHT" -> x += speed;
             }
-            System.out.println("x = " + x + " y = " + y);
+            //System.out.println("x = " + x + " y = " + y);
             if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 750 && isLive)) {
                 isLive = false;
                 break;

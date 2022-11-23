@@ -4,30 +4,64 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 public class MyPanel extends JPanel implements Runnable, KeyListener {
     Hero hero = null;
     Vector<Enemy> enemies = new Vector<>();
     Vector<Explode> bombs = new Vector<>();
+    Vector<Node> nodes = new Vector<>();
     Image image1 = null;
     Image image2 = null;
     Image image3 = null;
     int enemiesSize = 3;
 
-    public MyPanel() {
+    public MyPanel(String key) throws IOException {
+        File file = new File(Recorder.getRecordFile());
+        if(file.exists()) {
+            nodes = Recorder.getNodesAndNum();
+        } else {
+            System.out.println("Record doesn't exist, create a new game.");
+            key = "y";
+        }
         hero = new Hero(400, 500);
         hero.setSpeed(3);
-        for (int i = 0; i < enemiesSize; i++) {
-            Enemy enemy = new Enemy(100 * (i + 1), 0);
-            enemy.setEnemies(enemies);
-            enemy.setDirection("DOWN");
-            new Thread(enemy).start();
-            shot st = new shot(enemy.getX() + 20, enemy.getY() + 60, enemy.getDirection());
-            enemy.getShots().add(st);
-            new Thread(st).start();
-            enemies.add(enemy);
+        switch (key) {
+            case "y":
+                for (int i = 0; i < enemiesSize; i++) {
+                Enemy enemy = new Enemy(100 * (i + 1), 0);
+                enemy.setEnemies(enemies);
+                enemy.setDirection("DOWN");
+                new Thread(enemy).start();
+                shot st = new shot(enemy.getX() + 20, enemy.getY() + 60, enemy.getDirection());
+                enemy.getShots().add(st);
+                new Thread(st).start();
+                enemies.add(enemy);
+                Recorder.setEnemies(enemies);
+                Recorder.setHitNum(0);
+            }
+                break;
+            case "r":
+                for (int i = 0; i < nodes.size(); i++) {
+                    Node node = nodes.get(i);
+                    Enemy enemy = new Enemy(node.getX(), node.getY());
+                    enemy.setEnemies(enemies);
+                    enemy.setDirection(node.getDirection());
+                    new Thread(enemy).start();
+                    shot st = new shot(enemy.getX() + 20, enemy.getY() + 60, enemy.getDirection());
+                    enemy.getShots().add(st);
+                    new Thread(st).start();
+                    enemies.add(enemy);
+                    Recorder.setEnemies(enemies);
+                }
+                break;
+            default:
+                System.out.println("Wrong type in");
         }
+
+
         image1 = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Lenovo\\Desktop\\present\\ben.jpg");
         image2 = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Lenovo\\Desktop\\present\\2.jpg");
         image3 = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Lenovo\\Desktop\\present\\3.jpg");
