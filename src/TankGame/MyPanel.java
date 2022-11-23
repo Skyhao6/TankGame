@@ -20,6 +20,7 @@ public class MyPanel extends JPanel implements Runnable, KeyListener {
         hero.setSpeed(3);
         for (int i = 0; i < enemiesSize; i++) {
             Enemy enemy = new Enemy(100 * (i + 1), 0);
+            enemy.setEnemies(enemies);
             enemy.setDirection("DOWN");
             new Thread(enemy).start();
             shot st = new shot(enemy.getX() + 20, enemy.getY() + 60, enemy.getDirection());
@@ -32,10 +33,22 @@ public class MyPanel extends JPanel implements Runnable, KeyListener {
         image3 = Toolkit.getDefaultToolkit().getImage("C:\\Users\\Lenovo\\Desktop\\present\\3.jpg");
     }
 
+
+    public void showInfo(Graphics g) {
+        g.setColor(Color.BLACK);
+        Font font = new Font("Times New Roman", Font.BOLD, 25);
+        g.setFont(font);
+        g.drawString("Hit Tanks", 1020, 30);
+        drawTank(1020, 60, g, "UP", 1);
+        g.setColor(Color.BLACK);
+        g.drawString(Recorder.getHitNum()+"", 1080, 100);
+    }
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0, 0, 1000, 750);
+        showInfo(g);
         if (hero != null && hero.isLive) {
             drawTank(hero.getX(), hero.getY(), g, hero.getDirection(), 0);
         }
@@ -142,26 +155,32 @@ public class MyPanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-    public void hitTank(shot s, TankClass e) {
+    public void hitTank(shot s, TankClass tank) {
         int shotX = s.getX();
         int shotY = s.getY();
-        switch (e.getDirection()) {
+        switch (tank.getDirection()) {
             case "UP":
             case "DOWN":
-                if (shotX > e.getX() && shotX < e.getX() + 40
-                        && shotY > e.getY() && shotY < e.getY() + 60) {
+                if (shotX > tank.getX() && shotX < tank.getX() + 40
+                        && shotY > tank.getY() && shotY < tank.getY() + 60) {
                     s.isLive = false;
-                    e.setLive(false);
-                    Explode explode = new Explode(e.getX(), e.getY());
+                    tank.setLive(false);
+                    enemies.remove(tank);
+                    if(tank instanceof Enemy) Recorder.addNum();
+                    Explode explode = new Explode(tank.getX(), tank.getY());
                     bombs.add(explode);
                 }
                 break;
             case "RIGHT":
             case "LEFT":
-                if (shotX > e.getX() && shotX < e.getX() + 60
-                        && shotY > e.getY() && shotY < e.getY() + 40) {
+                if (shotX > tank.getX() && shotX < tank.getX() + 60
+                        && shotY > tank.getY() && shotY < tank.getY() + 40) {
                     s.isLive = false;
-                    e.setLive(false);
+                    tank.setLive(false);
+                    enemies.remove(tank);
+                    if(tank instanceof Enemy) Recorder.addNum();
+                    Explode explode = new Explode(tank.getX(), tank.getY());
+                    bombs.add(explode);
                 }
                 break;
         }
